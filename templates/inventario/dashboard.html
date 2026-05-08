@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load inventario_tags %}
+
+{% block title %}Dashboard - StockPro{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+    <div>
+        <h1 class="h2 fw-bold mb-1">
+            <i class="bi bi-speedometer2 text-purple"></i> Dashboard
+        </h1>
+        <p class="text-muted mb-0">
+            Bienvenido, <span class="fw-semibold text-white">{{ user.username }}</span>
+            {% if user.is_staff %}<span class="badge bg-purple-soft ms-1">Admin</span>{% endif %}
+        </p>
+    </div>
+    <a href="{% url 'producto_crear' %}" class="btn btn-gradient" id="btn-nuevo-dashboard">
+        <i class="bi bi-plus-lg"></i> Nuevo Producto
+    </a>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card glass-card stat-card h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted small mb-1 text-uppercase fw-semibold ls-wide">Total Productos</p>
+                        <h2 class="display-5 fw-bold mb-0">{{ total_productos }}</h2>
+                    </div>
+                    <div class="stat-icon stat-icon-blue"><i class="bi bi-box-seam-fill"></i></div>
+                </div>
+                <div class="mt-3">
+                    <a href="{% url 'producto_lista' %}" class="text-decoration-none small link-purple">Ver todos <i class="bi bi-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card glass-card stat-card h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted small mb-1 text-uppercase fw-semibold ls-wide">Bajo Stock</p>
+                        <h2 class="display-5 fw-bold mb-0 {% if productos_bajo_stock > 0 %}text-warning{% endif %}">{{ productos_bajo_stock }}</h2>
+                    </div>
+                    <div class="stat-icon {% if productos_bajo_stock > 0 %}stat-icon-warning{% else %}stat-icon-green{% endif %}">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </div>
+                </div>
+                <div class="mt-3"><span class="small text-muted">Umbral: &lt; {{ umbral }} unidades</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card glass-card stat-card h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted small mb-1 text-uppercase fw-semibold ls-wide">Valor Inventario</p>
+                        <h2 class="display-6 fw-bold mb-0 text-success">{{ valor_total|currency }}</h2>
+                    </div>
+                    <div class="stat-icon stat-icon-green"><i class="bi bi-currency-dollar"></i></div>
+                </div>
+                <div class="mt-3"><span class="small text-muted"><i class="bi bi-calculator"></i> Cantidad × Precio</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card glass-card h-100">
+            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                <h5 class="fw-bold mb-0"><i class="bi bi-bell-fill text-warning"></i> Alertas de Stock</h5>
+            </div>
+            <div class="card-body px-4 pb-4">
+                {% if alertas_stock %}
+                <div class="list-group list-group-flush">
+                    {% for producto in alertas_stock %}
+                    <a href="{% url 'producto_detalle' producto.pk %}" class="list-group-item list-group-item-action bg-transparent border-0 rounded mb-1 alert-stock-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0 fw-semibold">{{ producto.nombre }}</h6>
+                                <small class="text-muted">{{ producto.precio|currency }}</small>
+                            </div>
+                            <span class="badge bg-danger-soft pulse-badge"><i class="bi bi-exclamation-triangle"></i> {{ producto.cantidad }} uds</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle-fill text-success display-4 mb-3 d-block"></i>
+                    <p class="text-muted mb-0">¡Stock suficiente en todos los productos!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card glass-card h-100">
+            <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0"><i class="bi bi-clock-history text-purple"></i> Últimos Productos</h5>
+                <a href="{% url 'producto_lista' %}" class="btn btn-sm btn-outline-light">Ver todos</a>
+            </div>
+            <div class="card-body px-4 pb-4">
+                {% if ultimos_productos %}
+                <div class="table-responsive">
+                    <table class="table table-custom mb-0">
+                        <thead><tr><th>Producto</th><th class="text-center">Stock</th><th class="text-end">Precio</th></tr></thead>
+                        <tbody>
+                            {% for producto in ultimos_productos %}
+                            <tr class="{% if producto.stock_bajo %}row-stock-bajo{% endif %}">
+                                <td><a href="{% url 'producto_detalle' producto.pk %}" class="text-decoration-none text-white fw-medium">{{ producto.nombre }}</a></td>
+                                <td class="text-center">
+                                    {% if producto.stock_bajo %}<span class="badge bg-danger-soft"><i class="bi bi-exclamation-triangle"></i> {{ producto.cantidad }}</span>
+                                    {% else %}<span class="badge bg-success-soft">{{ producto.cantidad }}</span>{% endif %}
+                                </td>
+                                <td class="text-end fw-medium">{{ producto.precio|currency }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox display-4 text-muted mb-3 d-block"></i>
+                    <p class="text-muted mb-2">No hay productos registrados</p>
+                    <a href="{% url 'producto_crear' %}" class="btn btn-gradient btn-sm"><i class="bi bi-plus-lg"></i> Agregar</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

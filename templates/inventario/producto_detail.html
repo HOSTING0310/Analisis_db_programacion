@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load inventario_tags %}
+
+{% block title %}{{ producto.nombre }} - StockPro{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb breadcrumb-custom">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}"><i class="bi bi-house"></i> Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'producto_lista' %}">Productos</a></li>
+                <li class="breadcrumb-item active">{{ producto.nombre }}</li>
+            </ol>
+        </nav>
+
+        <div class="card glass-card">
+            <div class="card-body p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div>
+                        <h1 class="h3 fw-bold mb-1">{{ producto.nombre }}</h1>
+                        <p class="text-muted mb-0">
+                            <i class="bi bi-person"></i> {{ producto.usuario.username }} ·
+                            <i class="bi bi-calendar"></i> {{ producto.fecha_creacion|date:"d/m/Y H:i" }}
+                        </p>
+                    </div>
+                    {% if producto.stock_bajo %}
+                    <span class="badge bg-danger-soft fs-6 pulse-badge">
+                        <i class="bi bi-exclamation-triangle"></i> Stock Bajo
+                    </span>
+                    {% else %}
+                    <span class="badge bg-success-soft fs-6">
+                        <i class="bi bi-check-circle"></i> Stock OK
+                    </span>
+                    {% endif %}
+                </div>
+
+                {% if producto.descripcion %}
+                <div class="mb-4">
+                    <h6 class="text-muted text-uppercase small fw-semibold ls-wide">Descripción</h6>
+                    <p class="mb-0">{{ producto.descripcion }}</p>
+                </div>
+                {% endif %}
+
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-3">
+                        <div class="detail-metric">
+                            <span class="detail-metric-label">Cantidad</span>
+                            <span class="detail-metric-value {% if producto.stock_bajo %}text-danger{% else %}text-success{% endif %}">
+                                {{ producto.cantidad }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="detail-metric">
+                            <span class="detail-metric-label">Precio Unit.</span>
+                            <span class="detail-metric-value">{{ producto.precio|currency }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="detail-metric">
+                            <span class="detail-metric-label">Valor Total</span>
+                            <span class="detail-metric-value text-success">{{ producto.valor_total|currency }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="detail-metric">
+                            <span class="detail-metric-label">Actualizado</span>
+                            <span class="detail-metric-value small">{{ producto.fecha_actualizacion|date:"d/m/Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <a href="{% url 'producto_editar' producto.pk %}" class="btn btn-warning flex-grow-1" id="btn-editar-detalle">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a href="{% url 'producto_eliminar' producto.pk %}" class="btn btn-outline-danger" id="btn-eliminar-detalle">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </a>
+                    <a href="{% url 'producto_lista' %}" class="btn btn-outline-secondary" id="btn-volver-detalle">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Iniciar Sesión - StockPro{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center min-vh-75">
+    <div class="col-md-5 col-lg-4">
+        <div class="card glass-card auth-card">
+            <div class="card-body p-4 p-md-5">
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <div class="auth-icon mb-3">
+                        <i class="bi bi-box-seam-fill"></i>
+                    </div>
+                    <h1 class="h3 fw-bold mb-1">Bienvenido</h1>
+                    <p class="text-muted">Inicia sesión en tu cuenta</p>
+                </div>
+
+                <!-- Formulario -->
+                <form method="post" id="login-form">
+                    {% csrf_token %}
+
+                    {% if form.errors %}
+                    <div class="alert alert-danger alert-sm" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                        Usuario o contraseña incorrectos.
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">
+                            <i class="bi bi-person"></i> Usuario
+                        </label>
+                        <input type="text" name="username" id="id_username"
+                               class="form-control form-control-lg"
+                               placeholder="Nombre de usuario"
+                               autocomplete="username"
+                               autofocus required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="id_password" class="form-label">
+                            <i class="bi bi-lock"></i> Contraseña
+                        </label>
+                        <input type="password" name="password" id="id_password"
+                               class="form-control form-control-lg"
+                               placeholder="Tu contraseña"
+                               autocomplete="current-password"
+                               required>
+                    </div>
+
+                    <button type="submit" class="btn btn-gradient btn-lg w-100 mb-3" id="btn-login">
+                        <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                    </button>
+                </form>
+
+                <!-- Link a registro -->
+                <div class="text-center mt-3">
+                    <p class="text-muted mb-0">
+                        ¿No tienes cuenta?
+                        <a href="{% url 'registro' %}" class="link-purple fw-semibold">Regístrate aquí</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
